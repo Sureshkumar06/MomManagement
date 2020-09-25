@@ -9,6 +9,8 @@ public class DeviceGroupDTO {
 
     private Long deviceGroupId;
 
+    private Long customerId;
+
     private String deviceGroupName;
 
     private String active;

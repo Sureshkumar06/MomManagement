@@ -30,7 +30,7 @@ public class DeviceGroup extends RecordInfo implements Serializable {
     @Column(name = "device_group_name")
     private String deviceGroupName;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "deviceMaster",orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "deviceGroup",orphanRemoval = true,fetch = FetchType.LAZY)
     private List<DeviceMaster> deviceMasterList = new ArrayList<>();
 
     @Override

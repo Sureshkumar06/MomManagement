@@ -1,7 +1,9 @@
 package com.nova.mom.controllers;
 
 import com.nova.mom.dtos.CustomerDTO;
+import com.nova.mom.dtos.DeviceGroupDTO;
 import com.nova.mom.services.CustomerService;
+import com.nova.mom.services.DeviceGroupService;
 import com.nova.mom.utils.MoMConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,29 +20,29 @@ public class DeviceGroupController {
     private static final Logger LOGGER = LoggerFactory.getLogger(DeviceGroupController.class);
 
     @Autowired
-    CustomerService customerService;
+    DeviceGroupService deviceGroupService;
 
-    @PostMapping(MoMConstants.CUSTOMER_DETAILS)
-    public ResponseEntity<CustomerDTO> createCustomer(@RequestBody CustomerDTO customerDTO) {
-        CustomerDTO responseDto = customerService.createCustomer(customerDTO);
+    @PostMapping(MoMConstants.DEVICE_GROUP_DETAILS)
+    public ResponseEntity<DeviceGroupDTO> createDeviceGroup(@RequestBody DeviceGroupDTO deviceGroupDTO) {
+        DeviceGroupDTO responseDto = deviceGroupService.createDeviceGroup(deviceGroupDTO);
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @PutMapping(value = MoMConstants.CUSTOMER_DETAILS)
-    public ResponseEntity<CustomerDTO> updateCustomer(@RequestBody CustomerDTO customerDTO) {
-        CustomerDTO responseDto = customerService.updateCustomer(customerDTO);
+    @PutMapping(value = MoMConstants.DEVICE_GROUP_DETAILS)
+    public ResponseEntity<DeviceGroupDTO> updateDeviceGroup(@RequestBody DeviceGroupDTO deviceGroupDTO) {
+        DeviceGroupDTO responseDto = deviceGroupService.updateDeviceGroup(deviceGroupDTO);
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @GetMapping(MoMConstants.CUSTOMER_DETAILS)
-    public ResponseEntity<List<CustomerDTO>> getCustomerDetails() {
-        List<CustomerDTO> responseDto = customerService.getCustomerDetails();
+    @GetMapping(MoMConstants.DEVICE_GROUP_DETAILS)
+    public ResponseEntity<List<DeviceGroupDTO>> getDeviceGroupDetails() {
+        List<DeviceGroupDTO> responseDto = deviceGroupService.getDeviceGroupDetails();
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @GetMapping(value = MoMConstants.CUSTOMER_DETAILS + MoMConstants.CUSTOMER_ID)
-    public ResponseEntity<CustomerDTO> getCustomerDetailsById(@PathVariable Long customerId) {
-        CustomerDTO responseDto = customerService.getCustomerDetailsById(customerId);
+    @GetMapping(value = MoMConstants.DEVICE_GROUP_DETAILS + MoMConstants.DEVICE_GROUP_ID)
+    public ResponseEntity<DeviceGroupDTO> getDeviceGroupDetailsById(@PathVariable Long deviceGroupId) {
+        DeviceGroupDTO responseDto = deviceGroupService.getDeviceGroupDetailsById(deviceGroupId);
         return ResponseEntity.ok().body(responseDto);
     }
 
