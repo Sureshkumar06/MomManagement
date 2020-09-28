@@ -22,4 +22,8 @@ public class MoMConstants {
     public static final String DEVICE_GROUP_DETAILS="/devicegroupdetails";
 
     public static final String DEVICE_GROUP_ID="/{devicegroupid}";
+
+    public static final String DEVICE_DETAILS="/devicedetails";
+
+    public static final String DEVICE_MASTER_ID="/{devicemasterid}";
 }
