@@ -1,21 +1,26 @@
 package com.nova.mom.services.impl;
 
+import com.nova.mom.dtos.CustomerDTO;
 import com.nova.mom.dtos.DeviceDTO;
 import com.nova.mom.dtos.DeviceResponseDTO;
 import com.nova.mom.dtos.ReleaseDTO;
+import com.nova.mom.entities.CustomerMaster;
 import com.nova.mom.entities.DeviceGroup;
 import com.nova.mom.entities.DeviceMaster;
 import com.nova.mom.entities.ReleaseMaster;
+import com.nova.mom.mappers.CustomerMasterMapper;
 import com.nova.mom.mappers.DeviceMasterMapper;
 import com.nova.mom.mappers.ReleaseMasterMapper;
 import com.nova.mom.repositories.DeviceGroupRepository;
 import com.nova.mom.repositories.DeviceMasterRepository;
 import com.nova.mom.services.DeviceService;
+import liquibase.util.CollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,7 +50,7 @@ public class DeviceServiceImpl implements DeviceService {
                     deviceGroup.setDeviceGroupId(device.getDeviceGroupId());
                     deviceMaster.setDeviceGroup(deviceGroup);
                 }else if(device.getCustomerId() !=null && device.getDeviceGroupId() == null){
-                    Optional<DeviceGroup> deviceGroup = deviceGroupRepository.findByCustomer_CustomerIdAndDeviceGroupName(device.getCustomerId() ,"Default");
+                    Optional<DeviceGroup> deviceGroup = deviceGroupRepository.findByCustomerMaster_CustomerIdAndDeviceGroupName(device.getCustomerId() ,"Default");
                     deviceMaster.setDeviceGroup(deviceGroup.get());
                 } else {
                     LOGGER.info("give valid input in device service upload");
@@ -93,6 +98,11 @@ public class DeviceServiceImpl implements DeviceService {
                     return deviceDTORes;
                 }
                 deviceMaster = DeviceMasterMapper.INSTANCE.toEntity(deviceDTO);
+                if(deviceDTO.getDeviceGroupId() !=null){
+                    deviceMaster.setDeviceGroup(deviceGroupRepository.findById(deviceDTO.getDeviceGroupId()).get());
+                }else if(deviceDTO.getCustomerId() !=null && deviceDTO.getDeviceGroupId() ==null){
+                    deviceMaster.setDeviceGroup(deviceGroupRepository.findByCustomerMaster_CustomerIdAndDeviceGroupName(deviceDTO.getCustomerId() ,"Default").get());
+                }
                 if (deviceMasterRepository.save(deviceMaster) != null) {
                     deviceDTORes = getDeviceDetailsById(deviceDTO.getDeviceMasterId());
                 }
@@ -104,11 +114,19 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public List<DeviceDTO> getDeviceDetails() {
-        return Optional.ofNullable(deviceMasterRepository.findAll())
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(DeviceMasterMapper.INSTANCE::toDto)
-                .collect(Collectors.toList());
+        List<DeviceDTO> deviceDTOList = new ArrayList<>();
+        List<DeviceMaster> deviceMasterList = deviceMasterRepository.findAll();
+        if(deviceMasterList !=null && !deviceMasterList.isEmpty()){
+            deviceMasterList.stream().map(device ->{
+                DeviceDTO deviceDTO = new DeviceDTO();
+                deviceDTO = DeviceMasterMapper.INSTANCE.toDto(device);
+                deviceDTO.setCustomerId(device.getDeviceGroup().getCustomerMaster().getCustomerId());
+                deviceDTO.setDeviceGroupId(device.getDeviceGroup().getDeviceGroupId());
+                deviceDTOList.add(deviceDTO);
+                return null;
+            }).collect(Collectors.toList());
+        }
+        return deviceDTOList;
     }
 
     @Override
@@ -119,6 +137,8 @@ public class DeviceServiceImpl implements DeviceService {
             Optional<DeviceMaster> deviceMaster = deviceMasterRepository.findByDeviceMasterId(deviceMasterId);
             if(deviceMaster.isPresent()){
                 deviceDTO = DeviceMasterMapper.INSTANCE.toDto(deviceMaster.get());
+                deviceDTO.setCustomerId(deviceMaster.get().getDeviceGroup().getCustomerMaster().getCustomerId());
+                deviceDTO.setDeviceGroupId(deviceMaster.get().getDeviceGroup().getDeviceGroupId());
             }
         }else{
             LOGGER.info("invalid id for getDeviceDetailsById");

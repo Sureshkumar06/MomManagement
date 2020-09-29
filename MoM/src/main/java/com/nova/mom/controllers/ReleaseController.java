@@ -1,4 +1,5 @@
 package com.nova.mom.controllers;
+import com.nova.mom.dtos.CustomerDTO;
 import com.nova.mom.dtos.ReleaseDTO;
 import com.nova.mom.services.ReleaseService;
 import com.nova.mom.utils.MoMConstants;
@@ -26,7 +27,7 @@ public class ReleaseController {
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @PutMapping(value = MoMConstants.RELEASE_DETAILS)
+    @PutMapping(MoMConstants.RELEASE_DETAILS)
     public ResponseEntity<ReleaseDTO> updateRelease(@RequestBody ReleaseDTO releaseDTO) {
         LOGGER.info("update release method start");
         ReleaseDTO responseDto = releaseService.updateRelease(releaseDTO);
@@ -42,7 +43,15 @@ public class ReleaseController {
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @GetMapping(value = MoMConstants.RELEASE_DETAILS + MoMConstants.RELEASE_ID)
+//    @GetMapping(value = MoMConstants.RELEASE_DETAILS + MoMConstants.RELEASE_ID)
+//    public ResponseEntity<ReleaseDTO> getReleaseDetailsById(@PathVariable Long releaseId) {
+//        LOGGER.info("get by id release method start");
+//        ReleaseDTO responseDto = releaseService.getReleaseDetailsById(releaseId);
+//        LOGGER.info("get by id release method end");
+//        return ResponseEntity.ok().body(responseDto);
+//    }
+
+    @GetMapping(MoMConstants.RELEASE_DETAILS + MoMConstants.RELEASE_ID)
     public ResponseEntity<ReleaseDTO> getReleaseDetailsById(@PathVariable Long releaseId) {
         LOGGER.info("get by id release method start");
         ReleaseDTO responseDto = releaseService.getReleaseDetailsById(releaseId);

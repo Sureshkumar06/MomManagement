@@ -30,7 +30,7 @@ public class DeviceController {
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @PutMapping(value = MoMConstants.DEVICE_DETAILS)
+    @PutMapping(MoMConstants.DEVICE_DETAILS)
     public ResponseEntity<DeviceDTO> updateDevice(@RequestBody DeviceDTO deviceDTO) {
         LOGGER.info("update device method start");
         DeviceDTO responseDto = deviceService.updateDevice(deviceDTO);
@@ -46,7 +46,7 @@ public class DeviceController {
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @GetMapping(value = MoMConstants.DEVICE_DETAILS + MoMConstants.DEVICE_MASTER_ID)
+    @GetMapping(MoMConstants.DEVICE_DETAILS + MoMConstants.DEVICE_MASTER_ID)
     public ResponseEntity<DeviceDTO> getDeviceDetailsById(@PathVariable Long deviceMasterId) {
         LOGGER.info("get by id device method start");
         DeviceDTO responseDto = deviceService.getDeviceDetailsById(deviceMasterId);

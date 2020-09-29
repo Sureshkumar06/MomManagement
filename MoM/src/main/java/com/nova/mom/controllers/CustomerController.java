@@ -24,11 +24,11 @@ public class CustomerController {
     public ResponseEntity<CustomerDTO> createCustomer(@RequestBody CustomerDTO customerDTO) {
         LOGGER.info("create customer method start");
         CustomerDTO responseDto = customerService.createCustomer(customerDTO);
-        LOGGER.info("create customer method start");
+        LOGGER.info("create customer method end");
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @PutMapping(value = MoMConstants.CUSTOMER_DETAILS)
+    @PutMapping(MoMConstants.CUSTOMER_DETAILS)
     public ResponseEntity<CustomerDTO> updateCustomer(@RequestBody CustomerDTO customerDTO) {
         LOGGER.info("update customer method start");
         CustomerDTO responseDto = customerService.updateCustomer(customerDTO);
@@ -44,7 +44,7 @@ public class CustomerController {
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @GetMapping(value = MoMConstants.CUSTOMER_DETAILS + MoMConstants.CUSTOMER_ID)
+    @GetMapping(MoMConstants.CUSTOMER_DETAILS + MoMConstants.CUSTOMER_ID)
     public ResponseEntity<CustomerDTO> getCustomerDetailsById(@PathVariable Long customerId) {
         LOGGER.info("get by id customer method start");
         CustomerDTO responseDto = customerService.getCustomerDetailsById(customerId);

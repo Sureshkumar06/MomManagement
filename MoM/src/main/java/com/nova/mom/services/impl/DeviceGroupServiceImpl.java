@@ -1,13 +1,16 @@
 package com.nova.mom.services.impl;
 
 import com.nova.mom.controllers.DeviceGroupController;
+import com.nova.mom.dtos.CustomerDTO;
 import com.nova.mom.dtos.DeviceGroupDTO;
 import com.nova.mom.dtos.ReleaseDTO;
 import com.nova.mom.entities.CustomerMaster;
 import com.nova.mom.entities.DeviceGroup;
 import com.nova.mom.entities.ReleaseMaster;
+import com.nova.mom.mappers.CustomerMasterMapper;
 import com.nova.mom.mappers.DeviceGroupMapper;
 import com.nova.mom.mappers.ReleaseMasterMapper;
+import com.nova.mom.repositories.CustomerMasterRepository;
 import com.nova.mom.repositories.DeviceGroupRepository;
 import com.nova.mom.services.DeviceGroupService;
 import org.slf4j.Logger;
@@ -27,6 +30,9 @@ public class DeviceGroupServiceImpl implements DeviceGroupService {
 
     @Autowired
     private DeviceGroupRepository deviceGroupRepository;
+
+    @Autowired
+    private CustomerMasterRepository customerMasterRepository;
 
     @Override
     public DeviceGroupDTO createDeviceGroup(DeviceGroupDTO deviceGroupDTO) {
@@ -60,7 +66,7 @@ public class DeviceGroupServiceImpl implements DeviceGroupService {
     private boolean deviceGroupNameUniqueCheck(DeviceGroupDTO deviceGroupDTO){
         LOGGER.info("device group name unique check method start");
         boolean uniqueCheck = false;
-        if(deviceGroupRepository.findByCustomer_CustomerIdAndDeviceGroupName(deviceGroupDTO.getCustomerId(),deviceGroupDTO.getDeviceGroupName()).isPresent()){
+        if(deviceGroupRepository.findByCustomerMaster_CustomerIdAndDeviceGroupName(deviceGroupDTO.getCustomerId(),deviceGroupDTO.getDeviceGroupName()).isPresent()){
             uniqueCheck = false;
         } else {
             uniqueCheck = true;
@@ -74,7 +80,7 @@ public class DeviceGroupServiceImpl implements DeviceGroupService {
         boolean uniqueCheck = false;
         List<Long> ids = new ArrayList<>();
         ids.add(deviceGroupDTO.getDeviceGroupId());
-        if(deviceGroupRepository.findByCustomer_CustomerIdAndDeviceGroupNameAndDeviceGroupIdNotIn(deviceGroupDTO.getCustomerId(),deviceGroupDTO.getDeviceGroupName(),ids).isPresent()){
+        if(deviceGroupRepository.findByCustomerMaster_CustomerIdAndDeviceGroupNameAndDeviceGroupIdNotIn(deviceGroupDTO.getCustomerId(),deviceGroupDTO.getDeviceGroupName(),ids).isPresent()){
             uniqueCheck = false;
         } else {
             uniqueCheck = true;
@@ -101,6 +107,9 @@ public class DeviceGroupServiceImpl implements DeviceGroupService {
                     return deviceGroupDTORes;
                 }
                 deviceGroup = DeviceGroupMapper.INSTANCE.toEntity(deviceGroupDTO);
+                if(deviceGroupDTO.getCustomerId() !=null) {
+                    deviceGroup.setCustomerMaster(customerMasterRepository.findById(deviceGroupDTO.getCustomerId()).get());
+                }
                 if (deviceGroupRepository.save(deviceGroup) != null) {
                     deviceGroupDTORes = getDeviceGroupDetailsById(deviceGroupDTO.getDeviceGroupId());
                 }
@@ -116,11 +125,18 @@ public class DeviceGroupServiceImpl implements DeviceGroupService {
 
     @Override
     public List<DeviceGroupDTO> getDeviceGroupDetails() {
-        return Optional.ofNullable(deviceGroupRepository.findAll())
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(DeviceGroupMapper.INSTANCE::toDto)
-                .collect(Collectors.toList());
+        List<DeviceGroupDTO> deviceGroupDTOList = new ArrayList<>();
+        List<DeviceGroup> deviceGroupList = deviceGroupRepository.findAll();
+        if(deviceGroupList !=null && !deviceGroupList.isEmpty()){
+            deviceGroupList.stream().map(deviceGroup ->{
+                DeviceGroupDTO deviceGroupDTO = new DeviceGroupDTO();
+                deviceGroupDTO = DeviceGroupMapper.INSTANCE.toDto(deviceGroup);
+                deviceGroupDTO.setCustomerId(deviceGroup.getCustomerMaster().getCustomerId());
+                deviceGroupDTOList.add(deviceGroupDTO);
+                return null;
+            }).collect(Collectors.toList());
+        }
+        return deviceGroupDTOList;
     }
 
     @Override
@@ -131,6 +147,7 @@ public class DeviceGroupServiceImpl implements DeviceGroupService {
             Optional<DeviceGroup> deviceGroup = deviceGroupRepository.findByDeviceGroupId(deviceGroupId);
             if(deviceGroup.isPresent()){
                 deviceGroupDTO = DeviceGroupMapper.INSTANCE.toDto(deviceGroup.get());
+                deviceGroupDTO.setCustomerId(deviceGroup.get().getCustomerMaster().getCustomerId());
             }
         }else{
             LOGGER.info("invalid id for getDeviceGroupDetailsById");

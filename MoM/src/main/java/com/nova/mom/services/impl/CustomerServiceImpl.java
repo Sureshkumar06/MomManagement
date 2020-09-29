@@ -11,6 +11,7 @@ import com.nova.mom.mappers.DeviceGroupMapper;
 import com.nova.mom.mappers.ReleaseMasterMapper;
 import com.nova.mom.repositories.CustomerMasterRepository;
 import com.nova.mom.repositories.DeviceGroupRepository;
+import com.nova.mom.repositories.ReleaseMasterRepository;
 import com.nova.mom.services.CustomerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     private DeviceGroupRepository deviceGroupRepository;
+
+    @Autowired
+    private ReleaseMasterRepository releaseMasterRepository;
 
     @Override
     public CustomerDTO createCustomer(CustomerDTO customerDTO) {
@@ -67,8 +71,10 @@ public class CustomerServiceImpl implements CustomerService {
                     deviceGroup.setRecVerNo(1);
                     DeviceGroup deviceGroup1 = deviceGroupRepository.save(deviceGroup);
                     DeviceGroupDTO deviceGroupDTO = DeviceGroupMapper.INSTANCE.toDto(deviceGroup1);
+                    deviceGroupDTO.setCustomerId(customerMaster1.getCustomerId());
                     deviceGroupDTOList.add(deviceGroupDTO);
                     customerDTO = CustomerMasterMapper.INSTANCE.toDto(customerMaster1);
+                    customerDTO.setReleaseId(customerMaster1.getReleaseMaster().getReleaseId());
                     customerDTO.setDeviceGroupDTOList(deviceGroupDTOList);
                 }
             }else{
@@ -123,7 +129,11 @@ public class CustomerServiceImpl implements CustomerService {
                     customerDTORes.setErrorMessage("Data Not Available");
                     return customerDTORes;
                 }
-                customerMaster = CustomerMasterMapper.INSTANCE.toEntity(customerDTO);
+                customerMaster.setCustomerName(customerDTO.getCustomerName());
+//                customerMaster = CustomerMasterMapper.INSTANCE.toEntity(customerDTO);
+                if(customerDTO.getReleaseId() !=null) {
+                    customerMaster.setReleaseMaster(releaseMasterRepository.findById(customerDTO.getReleaseId()).get());
+                }
                 if (customerMasterRepository.save(customerMaster) != null) {
                     customerDTORes = getCustomerDetailsById(customerDTO.getCustomerId());
                 }
@@ -139,32 +149,46 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerDTO> getCustomerDetails() {
-        return Optional.ofNullable(customerMasterRepository.findAll())
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(CustomerMasterMapper.INSTANCE::toDto)
-                .collect(Collectors.toList());
+        List<CustomerDTO> customerDTOList = new ArrayList<>();
+        List<CustomerMaster> customerMasterList = customerMasterRepository.findAll();
+        if(customerMasterList !=null && !customerMasterList.isEmpty()){
+            customerMasterList.stream().map(customer ->{
+                CustomerDTO customerDTO = new CustomerDTO();
+                customerDTO = CustomerMasterMapper.INSTANCE.toDto(customer);
+                customerDTO.setReleaseId(customer.getReleaseMaster().getReleaseId());
+                customerDTOList.add(customerDTO);
+                return null;
+            }).collect(Collectors.toList());
+        }
+        return customerDTOList;
     }
 
     @Override
     public CustomerDTO getCustomerDetailsById(Long customerId) {
         LOGGER.info("get customer details by id service method start");
         CustomerDTO customerDTO = new CustomerDTO();
+        List<DeviceGroupDTO> deviceGroupDTOS = new ArrayList<>();
         if (customerId != null) {
             Optional<CustomerMaster> customerMaster = customerMasterRepository.findByCustomerId(customerId);
             if (customerMaster.isPresent()) {
                 if(customerMaster.get().getDeviceGroupList() !=null) {
+                    LOGGER.info("device group available for customer");
+                    LOGGER.info("device group available for customer"+customerMaster.get().getDeviceGroupList().size());
                     List<DeviceGroup> deviceGroupList = customerMaster.get().getDeviceGroupList();
-                    List<DeviceGroupDTO> deviceGroupDTOS = new ArrayList<>();
+                    LOGGER.info("device group available for customer"+deviceGroupList.size());
+
                     deviceGroupList.stream().map(deviceGroup -> {
                         DeviceGroupDTO deviceGroupDTO = new DeviceGroupDTO();
                         deviceGroupDTO = DeviceGroupMapper.INSTANCE.toDto(deviceGroup);
+                        deviceGroupDTO.setCustomerId(deviceGroup.getCustomerMaster().getCustomerId());
                         deviceGroupDTOS.add(deviceGroupDTO);
-                        return null;
+                        return deviceGroupDTOS;
                     }).collect(Collectors.toList());
-                    customerDTO.setDeviceGroupDTOList(deviceGroupDTOS);
+
                 }
                 customerDTO = CustomerMasterMapper.INSTANCE.toDto(customerMaster.get());
+                customerDTO.setReleaseId(customerMaster.get().getReleaseMaster().getReleaseId());
+                customerDTO.setDeviceGroupDTOList(deviceGroupDTOS);
             }
         } else {
             LOGGER.info("invalid id for getCustomerDetailsById");

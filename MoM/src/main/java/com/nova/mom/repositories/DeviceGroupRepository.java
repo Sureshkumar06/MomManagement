@@ -10,9 +10,9 @@ import java.util.Optional;
 @Repository
 public interface DeviceGroupRepository extends JpaRepository<DeviceGroup,Long> {
 
-    Optional<DeviceGroup> findByCustomer_CustomerIdAndDeviceGroupName(Long customerId, String deviceGroupName);
+    Optional<DeviceGroup> findByCustomerMaster_CustomerIdAndDeviceGroupName(Long customerId, String deviceGroupName);
 
-    Optional<DeviceGroup> findByCustomer_CustomerIdAndDeviceGroupNameAndDeviceGroupIdNotIn(Long customerId, String deviceGroupName, List<Long> ids);
+    Optional<DeviceGroup> findByCustomerMaster_CustomerIdAndDeviceGroupNameAndDeviceGroupIdNotIn(Long customerId, String deviceGroupName, List<Long> ids);
 
     Optional<DeviceGroup> findByDeviceGroupId(Long deviceGroupId);
 }

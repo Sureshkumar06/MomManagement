@@ -25,7 +25,7 @@ public class DeviceMaster extends RecordInfo implements Serializable {
     @JoinColumn(name = "device_group_id")
     private DeviceGroup deviceGroup;
 
-    @Column(name = "release_name")
+    @Column(name = "device_name")
     private String deviceName;
 
     @Column(name = "device_id")

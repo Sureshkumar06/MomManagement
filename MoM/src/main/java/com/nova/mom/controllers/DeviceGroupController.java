@@ -28,7 +28,7 @@ public class DeviceGroupController {
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @PutMapping(value = MoMConstants.DEVICE_GROUP_DETAILS)
+    @PutMapping(MoMConstants.DEVICE_GROUP_DETAILS)
     public ResponseEntity<DeviceGroupDTO> updateDeviceGroup(@RequestBody DeviceGroupDTO deviceGroupDTO) {
         DeviceGroupDTO responseDto = deviceGroupService.updateDeviceGroup(deviceGroupDTO);
         return ResponseEntity.ok().body(responseDto);
@@ -40,7 +40,7 @@ public class DeviceGroupController {
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @GetMapping(value = MoMConstants.DEVICE_GROUP_DETAILS + MoMConstants.DEVICE_GROUP_ID)
+    @GetMapping(MoMConstants.DEVICE_GROUP_DETAILS + MoMConstants.DEVICE_GROUP_ID)
     public ResponseEntity<DeviceGroupDTO> getDeviceGroupDetailsById(@PathVariable Long deviceGroupId) {
         DeviceGroupDTO responseDto = deviceGroupService.getDeviceGroupDetailsById(deviceGroupId);
         return ResponseEntity.ok().body(responseDto);
