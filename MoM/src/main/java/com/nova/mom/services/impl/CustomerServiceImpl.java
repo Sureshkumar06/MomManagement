@@ -16,9 +16,14 @@ import com.nova.mom.services.CustomerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
+import javax.print.attribute.standard.Media;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,6 +42,8 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     private ReleaseMasterRepository releaseMasterRepository;
 
+    private RestTemplate restTemplate = new RestTemplate();
+
     @Override
     public CustomerDTO createCustomer(CustomerDTO customerDTO) {
         LOGGER.info("create customer service method start");
@@ -49,6 +56,8 @@ public class CustomerServiceImpl implements CustomerService {
                     customerMaster.setReleaseMaster(releaseMaster);
                 }
                 customerMaster.setCustomerName(customerDTO.getCustomerName());
+                UUID uuid=UUID.randomUUID();
+                customerMaster.setCustomerMapperId(uuid);
                 customerMaster.setActive("Y");
                 customerMaster.setCreatedAt(new Date());
                 customerMaster.setCreatedBy("Admin");
@@ -77,6 +86,8 @@ public class CustomerServiceImpl implements CustomerService {
                     customerDTO.setReleaseId(customerMaster1.getReleaseMaster().getReleaseId());
                     customerDTO.setDeviceGroupDTOList(deviceGroupDTOList);
                 }
+                LOGGER.info("CustomerMapperId:::::::::::"+customerDTO.getCustomerMapperId());
+                saveUserGroup(customerDTO);
             }else{
                 LOGGER.info("customer name duplicate in create");
                 customerDTO.setErrorStatus(true);
@@ -85,6 +96,22 @@ public class CustomerServiceImpl implements CustomerService {
         }
         LOGGER.info("create customer service method end");
         return customerDTO;
+    }
+
+    private void saveUserGroup(CustomerDTO customerDTO){
+        LOGGER.info("rest template method start for save user group start");
+        String url = "http://localhost:8081/api/usermanagement/v1/userdefaultgroupcreation";
+        HttpHeaders headers = new HttpHeaders();
+        MediaType mediaType = new MediaType("application","json", Charset.forName("UTF-8"));
+        headers.setContentType(mediaType);
+
+        HttpEntity<CustomerDTO> entity = new HttpEntity<>(customerDTO,headers);
+        ResponseEntity<Boolean> response = restTemplate.exchange(url, HttpMethod.POST, entity, new ParameterizedTypeReference<Boolean>() {
+        });
+        if(response.getStatusCode() == HttpStatus.OK) {
+            LOGGER.info("Status:" + response.getBody());
+        }
+        LOGGER.info("rest template method start for save user group end");
     }
 
     private boolean customerNameUniqueCheck(CustomerDTO customerDTO){

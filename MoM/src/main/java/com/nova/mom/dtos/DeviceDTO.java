@@ -4,6 +4,7 @@ import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 public class DeviceDTO {
@@ -17,6 +18,8 @@ public class DeviceDTO {
     private String deviceName;
 
     private String deviceId;
+
+    private UUID userMapperId;
 
     private String active;
 

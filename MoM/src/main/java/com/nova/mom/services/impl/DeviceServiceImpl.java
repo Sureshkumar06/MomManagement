@@ -60,6 +60,7 @@ public class DeviceServiceImpl implements DeviceService {
                 }
                 deviceMaster.setDeviceId(device.getDeviceId());
                 deviceMaster.setDeviceName(device.getDeviceName());
+                deviceMaster.setUserMapperId(device.getUserMapperId() !=null ? device.getUserMapperId() : null);
 
                 deviceMaster.setActive("Y");
                 deviceMaster.setCreatedAt(new Date());
@@ -139,6 +140,7 @@ public class DeviceServiceImpl implements DeviceService {
                 deviceDTO = DeviceMasterMapper.INSTANCE.toDto(deviceMaster.get());
                 deviceDTO.setCustomerId(deviceMaster.get().getDeviceGroup().getCustomerMaster().getCustomerId());
                 deviceDTO.setDeviceGroupId(deviceMaster.get().getDeviceGroup().getDeviceGroupId());
+                deviceDTO.setUserMapperId(deviceMaster.get().getUserMapperId() !=null ? deviceMaster.get().getUserMapperId() : null);
             }
         }else{
             LOGGER.info("invalid id for getDeviceDetailsById");

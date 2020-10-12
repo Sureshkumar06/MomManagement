@@ -4,9 +4,11 @@ import lombok.Data;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.UUID;
 
 @Entity
 @Table(name = "device_master")
@@ -30,6 +32,10 @@ public class DeviceMaster extends RecordInfo implements Serializable {
 
     @Column(name = "device_id")
     private String deviceId;
+
+    @Column(name = "user_mapper_id")
+    @Type(type="uuid-char")
+    private UUID userMapperId;
 
     @Override
     public boolean equals(Object o) {

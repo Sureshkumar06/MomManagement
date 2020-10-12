@@ -43,14 +43,6 @@ public class ReleaseController {
         return ResponseEntity.ok().body(responseDto);
     }
 
-//    @GetMapping(value = MoMConstants.RELEASE_DETAILS + MoMConstants.RELEASE_ID)
-//    public ResponseEntity<ReleaseDTO> getReleaseDetailsById(@PathVariable Long releaseId) {
-//        LOGGER.info("get by id release method start");
-//        ReleaseDTO responseDto = releaseService.getReleaseDetailsById(releaseId);
-//        LOGGER.info("get by id release method end");
-//        return ResponseEntity.ok().body(responseDto);
-//    }
-
     @GetMapping(MoMConstants.RELEASE_DETAILS + MoMConstants.RELEASE_ID)
     public ResponseEntity<ReleaseDTO> getReleaseDetailsById(@PathVariable Long releaseId) {
         LOGGER.info("get by id release method start");

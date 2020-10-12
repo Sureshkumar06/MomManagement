@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 public class CustomerDTO {
@@ -16,6 +17,8 @@ public class CustomerDTO {
     private Long releaseId;
 
     private String active;
+
+    private UUID customerMapperId;
 
     private String version;
 
